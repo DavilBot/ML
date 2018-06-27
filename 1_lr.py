@@ -1,8 +1,3 @@
-
-
-
-
-
 import pandas as pd
 import numpy as np
 from dr import SQLConnector
@@ -11,15 +6,16 @@ from sklearn import linear_model
 
 s = SQLConnector(host="localhost",pwd="r0b0t161",db="db_crypto",user="robot")
 query = "SELECT * FROM `prices1m` LIMIT 61458"
-data_p = pd.DataFrame(s.exec_sql(query))
+data_p = pd.read_csv("prices1m.csv")
+data_p.columns = ['id', 'ticker', 'mts', 'open', 'close', 'high', 'low', 'volume', 'updated_at']
 #data_p.drop(['id', 'ticker', 'mts', 'updated_at'], axis = 1)
 df = pd.DataFrame()
 df['open'] = data_p['open']
 df['close'] = data_p['close']
 df['high'] = data_p['high']
 df['low'] = data_p['low']
-df['volume'] = data_p['volume']
-data_r = pd.read_csv("trendhistory_2018_06_13.csv")#, nrows = 56040)
+#df['volume'] = data_p['volume']
+data_r = pd.read_csv("trendhistory_2018_06_13.csv", nrows = 50044)
 
 X = np.asarray(df)
 y = np.asarray(data_r['percent_number'])
