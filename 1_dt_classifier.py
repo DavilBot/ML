@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 from dr import SQLConnector
 import matplotlib.pyplot as plt
-from sklearn import tree
+from sklearn import tree, model_selection
+from sklearn.metrics import classification_report
 import sys
 #import talib as ta
 s = SQLConnector(host="localhost",pwd="r0b0t161",db="db_crypto",user="robot")
@@ -34,5 +35,11 @@ split = int(0.7*len(df))
 X_train, X_test, y_train, y_test = X[:split], X[split:], y[:split], y[split:]
 model = tree.DecisionTreeClassifier(criterion = 'gini')
 model = model.fit (X_train,y_train)
+y_true, y_pred = y_test, model.predict(X_test)
+kfold = model_selection.KFold(n_splits = 10, random_state = 7)
+scoring = 'roc_auc'
+results = model_selection.cross_val_score(model, X,y,cv=kfold, scoring=scoring)
+print(results.mean())
+print(classification_report(y_true, y_pred))
 print(model.score(X_train, y_train))
 

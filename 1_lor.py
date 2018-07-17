@@ -2,8 +2,8 @@ import time
 import pandas as pd
 import numpy as np
 from dr import SQLConnector
-import matplotlib.pyplot as plt
-from sklearn import linear_model
+from sklearn import linear_model, model_selection
+from sklearn.metrics import classification_report, confusion_matrix
 #import talib as ta
 s = SQLConnector(host="localhost",pwd="r0b0t161",db="db_crypto",user="robot")
 query = "SELECT * FROM `prices1m` ORDER BY `updated_at` DESC LIMIT 61458"
@@ -30,10 +30,15 @@ df = df.dropna()
 X = df.iloc[:,:9]
 y = np.where (df['close'].shift(-1) > df['close'],1,-1)
 split = int(0.7*len(df))
-
 X_train, X_test, y_train, y_test = X[:split], X[split:], y[:split], y[split:]
 model = linear_model.LogisticRegression()
-
 model = model.fit (X_train,y_train)
+y_true, y_pred = y_test, model.predict(X_test)
+kfold = model_selection.KFold(n_splits=10, random_state=7)
+scoring = "roc_auc"
+results = model_selection.cross_val_score(model, X, y, cv=kfold, scoring=scoring)
+print(results.mean())
+print(classification_report(y_true, y_pred))
+print(confusion_matrix(y_true, y_pred))
 print(model.score(X_train, y_train))
 

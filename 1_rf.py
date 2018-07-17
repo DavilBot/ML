@@ -4,7 +4,10 @@ import numpy as np
 from dr import SQLConnector
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
 import sys
+from timeit import default_timer as timer
+start_time = timer()
 #import talib as ta
 s = SQLConnector(host="localhost",pwd="r0b0t161",db="db_crypto",user="robot")
 query = "SELECT * FROM `prices1m` ORDER BY `updated_at` DESC LIMIT 61458"
@@ -21,19 +24,22 @@ df['low'] = data_p['low']
 data_r = pd.read_csv("trendhistory_2018_06_13.csv", nrows = 50045)
 df = df.dropna()
 df = df.iloc[:,:4]
-print(df.head())
-df['S_10'] = df['close'].rolling(window=10).mean()
-df['Corr'] = df['close'].rolling(window=10).corr(df['S_10'])
+#print(df.head())
+#df['S_10'] = df['close'].rolling(window=10).mean()
+#df['Corr'] = df['close'].rolling(window=10).corr(df['S_10'])
 #df['RSI'] = ta.RSI(np.array(df['close']), timeperiod =10)
-df['Open-Close'] = df['open'] - df['close'].shift(1)
-df['Open-Open'] = df['open'] - df['open'].shift(1)
-df = df.dropna()
-X = df.iloc[:,:9]
+#df['Open-Close'] = df['open'] - df['close'].shift(1)
+#df['Open-Open'] = df['open'] - df['open'].shift(1)
+#df = df.dropna()
+X = df#.iloc[:,:9]
 y = np.where (df['close'].shift(-1) > df['close'],1,-1)
 split = int(0.7*len(df))
 X_train, X_test, y_train, y_test = X[:split], X[split:], y[:split], y[split:]
-model = RandomForestClassifier()
+model = RandomForestClassifier(n_jobs = -1, random_state = 0)
 model = model.fit(X_train,y_train)
-print(model.score(X_train, y_train))
+y_true, y_pred = y_test, model.predict(X_test)
+print(classification_report(y_true, y_pred))
+print(confusion_matrix(y_true, y_pred))
+#print(model.score(X_train, y_train))
 print(model.predict(X_test))
-
+print(str(timer()-start_time) + "TIME")
