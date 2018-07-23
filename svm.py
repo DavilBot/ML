@@ -29,7 +29,7 @@ y = np.where (df['close'].shift(-1) > df['close'],1,-1)
 split = int(0.7*len(df))
 
 X_train, X_test, y_train, y_test = X[:split], X[split:], y[:split], y[split:]
-model = svm.SVC(kernel='linear', C=1,gamma=1)
+model = svm.SVC(kernel='linear',gamma=1)
 model.fit(X,y)
 print('Score: {}'.format(model.score(X_train, y_train)))
 print('Predicted :{}'.format(model.predict(X_test)))

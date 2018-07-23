@@ -42,4 +42,3 @@ results = model_selection.cross_val_score(model, X,y,cv=kfold, scoring=scoring)
 print(results.mean())
 print(classification_report(y_true, y_pred))
 print(model.score(X_train, y_train))
-
